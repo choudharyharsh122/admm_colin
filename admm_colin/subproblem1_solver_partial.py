@@ -2,6 +2,10 @@
 OC-based PDE-constrained topology optimization solver.
 
 Implements design update for arbitrary meshes and boundary conditions.
+
+This is same as subproblem1_solver.py but only difference is that 
+at each OC iteration it freezes the design variables that have slow 
+velocity of update or have very low sensitivity
 """
 
 from __future__ import annotations
