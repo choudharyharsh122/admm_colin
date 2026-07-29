@@ -120,10 +120,10 @@ def plot_control_field(control_vec, dim: int, *, ax=None, title: str = "Control"
     ax.autoscale_view()
 
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="4%", pad=0.1)
-    cbar = plt.colorbar(m, cax=cax, shrink=0.85)
-    cbar.set_ticks(np.linspace(0, 1, 6))
-    cbar.ax.tick_params(labelsize=14)
+    #cax = divider.append_axes("right", size="4%", pad=0.1)
+    #cbar = plt.colorbar(m, cax=cax, shrink=0.85)
+    #cbar.set_ticks(np.linspace(0, 1, 6))
+    #cbar.ax.tick_params(labelsize=14)
     ax.set_axis_off()
 
     if title:

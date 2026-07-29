@@ -66,12 +66,12 @@ def _plot_fenics_function_on_ax(f: Function, ax, title: str):
     ax.autoscale_view()        # rescale to data
 
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="4%", pad=0.1)
+    #cax = divider.append_axes("right", size="4%", pad=0.1)
 
-    cbar = plt.colorbar(m, cax=cax, shrink=0.85)
+    #cbar = plt.colorbar(m, cax=cax, shrink=0.85)
     #cbar = plt.colorbar(m, ax=ax)
-    cbar.ax.tick_params(labelsize=14)
-    ax.set_title(title)
+    #cbar.ax.tick_params(labelsize=14)
+    #ax.set_title(title)
     ax.set_axis_off()
     #ax.set_title(title)
 
@@ -200,7 +200,7 @@ def fenicsModel(
     alpha: float,
     n: int,
     seed: int = 0,
-    base_dir: str = "fenics_model_tri",
+    base_dir: str = "fenics_model_tri_1e-06",
 ) -> FenicsModel:
     """
     Usage:

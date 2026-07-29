@@ -1,5 +1,6 @@
 import argparse
 import math
+import time
 from pathlib import Path
 
 import h5py
@@ -263,16 +264,19 @@ def run_topology_optimization(
     iK = np.repeat(tris, 3, axis=1).ravel()
     jK = np.tile(tris, (1, 3)).ravel()
 
+    t_filter_start = time.perf_counter()
     if neighbor_template is None:
         centroids = coords[tris].mean(axis=1)
         H, Hs = prepare_filter_from_centroids(centroids, rmin)
     else:
         H, Hs = prepare_filter_from_template(neighbor_template, rmin)
+    runtime_filter = time.perf_counter() - t_filter_start
 
     a = np.full(nele, volfrac, dtype=float)
 
     loop = 0
     change = 1.0
+    t_algo_start = time.perf_counter()
     while change > tol and loop < maxiter:
         loop += 1
         a_old = a.copy()
@@ -303,7 +307,9 @@ def run_topology_optimization(
             f"ch.: {change:6.3f} rmin={rmin:.6f}"
         )
 
-    return a, coords, tris, tri_type, fixeddofs, iK, jK, F
+    runtime_algorithm = time.perf_counter() - t_algo_start
+
+    return a, coords, tris, tri_type, fixeddofs, iK, jK, F, runtime_filter, runtime_algorithm
 
 def discretize_control(a_cont: np.ndarray, volfrac: float) -> np.ndarray:
     """ volume preserving rounding """
@@ -322,12 +328,22 @@ def save_result(
     mesh_dim: int,
     r: float,
     rmin: float,
+    runtime_filter: float,
+    runtime_algorithm: float,
+    runtime_total: float,
+    runtime_template_prep: float,
+    runtime_template_filter_algo: float,
 ):
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with h5py.File(output_path, "w") as h5f:
         h5f.attrs["mesh_dim"] = int(mesh_dim)
         h5f.attrs["r"] = float(r)
         h5f.attrs["rmin"] = float(rmin)
+        h5f.attrs["runtime_filter"] = float(runtime_filter)
+        h5f.attrs["runtime_algorithm"] = float(runtime_algorithm)
+        h5f.attrs["runtime_total"] = float(runtime_total)
+        h5f.attrs["runtime_template_prep"] = float(runtime_template_prep)
+        h5f.attrs["runtime_template_filter_algo"] = float(runtime_template_filter_algo)
         h5f.create_dataset("control_cont", data=control_cont)
         h5f.create_dataset("control_disc", data=control_disc)
         h5f.create_dataset("compliance_disc", data=np.float64(compliance_disc))
@@ -344,22 +360,24 @@ def main():
     parser.add_argument("--num-r", type=int, default=10)
     parser.add_argument("--volfrac", type=float, default=0.4)
     parser.add_argument("--penal", type=float, default=3.0)
-    parser.add_argument("--eps", type=float, default=1e-3)
+    parser.add_argument("--eps", type=float, default=1e-6)
     parser.add_argument("--f0", type=float, default=1.0)
     parser.add_argument("--tol", type=float, default=1e-2)
     parser.add_argument("--maxiter", type=int, default=200)
-    parser.add_argument("--output-root", type=str, default="OC_results_new")
+    parser.add_argument("--output-root", type=str, default="OC_results_mew")
     args = parser.parse_args()
 
     r_values = np.linspace(args.r_start, args.r_end, args.num_r)
     rmin_values = r_values / args.mesh_dim
 
     # Build centroid-distance model for the mesh.
+    t_template_start = time.perf_counter()
     base_coords, base_tris, _, _, _, _ = build_unitsquaremesh_right_tri(args.mesh_dim)
     base_centroids = base_coords[base_tris].mean(axis=1)
     neighbor_template = build_exact_filter_template(
         base_centroids, rmax=float(np.max(rmin_values))
     )
+    runtime_template_prep = time.perf_counter() - t_template_start
     
     # Builds the graph of mesh for Total variation calculation on the solution later.
     # This method is kept same for admm and oc method.
@@ -370,13 +388,14 @@ def main():
     scale = build_scale(graph)
 
     for run_idx, r in enumerate(r_values, start=1):
+        t_run_start = time.perf_counter()
         rmin = float(r / args.mesh_dim)
         print(
             f"\n=== Run {run_idx}/{len(r_values)}: r={r:.6f}, "
             f"rmin={rmin:.6f} ==="
         )
 
-        control_cont, coords, tris, tri_type, fixeddofs, iK, jK, F = run_topology_optimization(
+        control_cont, coords, tris, tri_type, fixeddofs, iK, jK, F, runtime_filter, runtime_algorithm = run_topology_optimization(
             mesh_dim=args.mesh_dim,
             volfrac=args.volfrac,
             penal=args.penal,
@@ -404,6 +423,8 @@ def main():
         )
 
         tv_disc = compute_tv(control_disc, graph, scale)
+        runtime_total = time.perf_counter() - t_run_start
+        runtime_template_filter_algo = runtime_template_prep + runtime_filter + runtime_algorithm
 
         r_folder = f"{r:.2f}"
         output_path = Path(args.output_root) / r_folder / f"{args.mesh_dim}.h5"
@@ -416,6 +437,16 @@ def main():
             args.mesh_dim,
             r,
             rmin,
+            runtime_filter,
+            runtime_algorithm,
+            runtime_total,
+            runtime_template_prep,
+            runtime_template_filter_algo,
+        )
+        print(
+            f"Runtimes: filter={runtime_filter:.3f}s, "
+            f"algorithm={runtime_algorithm:.3f}s, total={runtime_total:.3f}s, "
+            f"template+filter+algo={runtime_template_filter_algo:.3f}s"
         )
         print(f"Saved: {output_path}")
 

@@ -9,6 +9,15 @@ admm_to_binary/
 admm_nc/admm_alpha_rho_sweep/
 *sweep*/
 
+# LArge data files in folders
+admm_colin/run_data*
+admm_colin/__pycache__/
+admm_nc/
+oc_method/OC_results*
+relax_and_round_smooth/fenics_model*
+utility_plots/
+
+
 # Large binary data
 *.h5
 *.pkl

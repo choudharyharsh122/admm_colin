@@ -227,19 +227,19 @@ def A_tri(cell, i, j, ip, jp, h):
         # Case 1: same node pairing
         if i == ip and j == jp:
             if I == i and J == j - 1:
-                return 2.0 
-            elif I == i - 1 and J == j:
-                return 2.0 
-            else:
                 return 1.0 
+            elif I == i - 1 and J == j:
+                return 1.0 
+            else:
+                return 0.5 
 
         # Case 2: vertical adjacent nodes pairing: |i-i'|=1, |j-j'|=0
         if di == 1 and dj == 0:
-            return -1.0 
+            return -0.5
 
         # Case 3: horizontal adjacent nodes pairing: |i-i'|=0, |j-j'|=1
         if di == 0 and dj == 1:
-            return -1.0 
+            return -0.5 
 
         # Case 4: diagonal adjacent nodes paring: |i-i'|=1 and |j-j'|=1
         if di == 1 and dj == 1:
@@ -501,7 +501,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--mesh_list", required=True, type=parse_int_list)     # e.g. 16,32,64
     parser.add_argument("--alpha_list", required=True, type=parse_float_list)  # e.g. 1e-5,1e-6
-    parser.add_argument("--source_strength", type=float, default=0.01)
+    parser.add_argument("--source_strength", type=float, default=1.0)
     parser.add_argument("--vol_frac", type=float, default=0.4)
     args = parser.parse_args()
 

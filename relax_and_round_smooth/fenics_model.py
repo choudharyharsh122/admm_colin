@@ -40,7 +40,7 @@ p = Constant(3)  # power used in the solid isotropic material
 # solution to attain either 0 or 1
 eps = Constant(1.0e-3)  # epsilon used in the solid isotropic material
 
-def k(a):
+def simp_k(a):
     """Solid isotropic material with penalisation (SIMP) conductivity
   rule, equation (11)."""
     return eps + (1 - eps) * a ** p
@@ -57,7 +57,7 @@ def forward(a, f, bc ):
     u = Function(P, name="Temperature")
     v = TestFunction(P)
 
-    F = inner(grad(v), k(a) * grad(u)) * dx - f * v * dx
+    F = inner(grad(v), simp_k(a) * grad(u)) * dx - f * v * dx
     print(type(F))
     a, L = lhs(F), rhs(F)
     solve(F == 0, u, bc, solver_parameters={
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Topology Optimization with FEniCS")
     parser.add_argument("--alpha", type=str, required=True, help="Comma-separated list of alpha values (e.g., '1e-5,1e-4,1e-3')")
     parser.add_argument("--mesh-list", type=str, required=True, help="Comma-separated list of mesh sizes (e.g., '64,128,256')")
-    parser.add_argument("--source_strength", type=float, default=0.01)
+    parser.add_argument("--source_strength", type=float, default=1.0)
     parser.add_argument("--vol_frac", type=float, default=0.4)
     args = parser.parse_args()
     
@@ -134,7 +134,7 @@ if __name__ == "__main__":
             dx = Measure("dx", domain=mesh)
             f = interpolate(Constant(src), P)  # the volume source term for the PDE
             dS = Measure("dS", domain=mesh)
-            eps_tv = 1e-12
+            eps_tv = 1e-6
             bc = [DirichletBC(P, 0.0, WestNorth())]
 
             t0 = time.perf_counter()
@@ -148,7 +148,7 @@ if __name__ == "__main__":
             ub = 1.0
         
             F_form  = f*u*dx          
-            TV_form = alpha * sqrt(jump(a)**2 + eps_tv) * dS
+            TV_form = alpha * (sqrt((1+2*eps_tv)*jump(a)**2 + eps_tv) - eps_tv) * dS
 
             AL_form = F_form + TV_form
             J = assemble(AL_form)            # assemble ONCE
@@ -206,7 +206,7 @@ if __name__ == "__main__":
             print(f"    Runtime: {np.float64(tot_time):.2f}s", flush=True)
             
             # Save data to h5py
-            save_dir = f"fenics_model_tri/{alpha_val}"
+            save_dir = f"fenics_model_tri_{eps_tv}/{alpha_val}"
             os.makedirs(save_dir, exist_ok=True)
             
             h5_path = f"{save_dir}/{n}.h5"
@@ -215,10 +215,10 @@ if __name__ == "__main__":
                 summary = h5f.require_group("summary")
 
                 # wipe previous content (safe for reruns)
-                for k in list(summary.keys()):
-                    del summary[k]
-                for k in list(summary.attrs.keys()):
-                    del summary.attrs[k]
+                for key in list(summary.keys()):
+                    del summary[key]
+                for key in list(summary.attrs.keys()):
+                    del summary.attrs[key]
 
                 # Metadata (force native scalars)
                 summary.attrs["dim"] = np.int64(n)

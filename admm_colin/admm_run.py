@@ -16,7 +16,7 @@ from cyipopt import Problem
 # Local imports
 from design_variables import DesignVariables
 
-from backup_sub1_oc_accurate import (
+from admm_methods.admm_colin.subproblem1_solver import (
     Subproblem1Solver,
     MaterialInterpolation,
     generate_unit_square_mesh,
@@ -346,6 +346,9 @@ def run_trial(dim: int, idx: int, params) -> None:
                 
                 
                 #### Penalty parameter update logic (if enabled) ####
+                ### running average based which keeps track of infeasibility
+                ### right from the first iteration and updates based on 
+                ### the running average of relative infeasibility decrease.
                 if penalty_update_method == "running_avg":
                     # Adaptive rho update based on running mean of relative infeasibility decrease.
                     if len(infeas_list) >= 2:
@@ -378,9 +381,12 @@ def run_trial(dim: int, idx: int, params) -> None:
                                     f"(factor={params.RHO_INCREASE_FACTOR:.3f})",
                                     flush=True,
                                 )
+                ### This is a bit weird but seems to work too, here I keep the
+                ### penalty parameter fixed for the first 10 iterations and then
+                ###  update it based on a schedule but here I just update every iteration.
                 elif penalty_update_method == "periodic":
                     # Start periodic updates after iter 10, then update every 2 iterations.
-                    if (k + 1) > 10 and ((k + 1 - 10) % 2 == 0):
+                    if (k + 1) > 10 and ((k + 1 - 10) % 1 == 0):
                         rho_k *= params.RHO_INCREASE_FACTOR
                         # Scaled-dual form: keep unscaled multiplier consistent when rho changes.
                         #lam_k1 /= params.RHO_INCREASE_FACTOR
