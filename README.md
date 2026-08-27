@@ -26,12 +26,12 @@ NOTE : To run the MIP version of ADMM set these two parameters in the config fil
 
 > python heat_sink/relax_and_round_smooth/fenics_perimeter_adaptive_sweep.py --alpha-start 0.1 --alpha-end 1 --perimeter-start 200 --perimeter-end 800 --alpha-init 0.5
 
-9) The perimeter sweep automatically samples alpha and r values by sucessive subdivision of alpha range so that final perimeter values are uniform.
+8) The perimeter sweep automatically samples alpha and r values by sucessive subdivision of alpha range so that final perimeter values are uniform.
 
-8) After completion of each instance, the results are stored in respective directories,
+9) After completion of each instance, the results are stored in respective directories,
 files with names {mesh_dim}.h5 are created.
 
-9) In each method, there is a notebook file to help visualize all the history and results.
+10) In each method, there is a notebook file to help visualize all the history and results.
 
 ### Please check the config files in admm folders for details about parameters, all the algorithm related parameters are in admm_config.cfg.
 
