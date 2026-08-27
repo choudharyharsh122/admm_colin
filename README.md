@@ -20,11 +20,13 @@ NOTE : To run the MIP version of ADMM set these two parameters in the config fil
 
 7) To run the perimeter sweep, please run the following files
 
-> python heat_sink/admm_colin/admm_perimeter_adaptive_sweep.py
+> python heat_sink/admm_colin/admm_perimeter_adaptive_sweep.py --alpha-start 0.1 --alpha-end 1 --perimeter-start 200 --perimeter-end 800 --alpha-init 0.5
 
-> python heat_sink/oc_method/oc_perimeter_adaptive_sweep.py
+> python heat_sink/oc_method/oc_perimeter_adaptive_sweep.py --r-start 2 --r-end 20 --perimeter-start 200 --perimeter-end 800 --r-init 5
 
-> python heat_sink/relax_and_round_smooth/fenics_perimeter_adaptive_sweep.py
+> python heat_sink/relax_and_round_smooth/fenics_perimeter_adaptive_sweep.py --alpha-start 0.1 --alpha-end 1 --perimeter-start 200 --perimeter-end 800 --alpha-init 0.5
+
+9) The perimeter sweep automatically samples alpha and r values by sucessive subdivision of alpha range so that final perimeter values are uniform.
 
 8) After completion of each instance, the results are stored in respective directories,
 files with names {mesh_dim}.h5 are created.
