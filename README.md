@@ -1,11 +1,38 @@
 ### To run please use this command in the respecive directory
 
-> python admm_run.py
 
+### Some important points to note: 
+
+1) There are two folders: heat_sink and cantilever.
+2) There are 4 methods under test in the ADMM paper namely : ADMM-R&R, ADMM-MIP, Relax&Round (uses FENiCS backend), Kernel filtering(uses convex linearization)
+3) The ADMM methods solve two subproblems (subproblem 1: PDE+penalty , subproblem2: TV+penalty)
+4) Subproblem 1 is convexified using the ConLin approach, subproblem 2 is Quadractic constraint optimization.
+5) Different backends can be configured for solving subproblem 2 in ADMM (see the file admm_config.cfg in respective admm_colin folders)
+6) If you want to run one instance of each of the 4 methods, please run these files:
+
+> python heat_sink/admm_colin/admm_run.py
+> python heat_sink/oc_method/oc_r_sweep.py
+> python heat_sink/relax_and_round_smooth/fenics_model.py
+
+NOTE : The oc_r_sweep is meant to run a sweep over r values so please set r-start, r-end ato same values and num-r to 1.
+NOTE : To run the MIP version of ADMM set these two parameters in the config file:
+> use_mip = false
+> backend = gurobi
+
+7) To run the perimeter sweep, please run the following files
+
+> python heat_sink/admm_colin/admm_perimeter_adaptive_sweep.py
+> python heat_sink/oc_method/oc_perimeter_adaptive_sweep.py
+> python heat_sink/relax_and_round_smooth/fenics_perimeter_adaptive_sweep.py
+
+8) After completion of each instance, the results are stored in respective directories,
+files with names {mesh_dim}.h5 are created.
+
+9) In each method, there is a notebook file to help visualize all the history and results.
 
 ### Please check the config files in admm folders for details about parameters, all the algorithm related parameters are in admm_config.cfg.
 
-### Once the tests are run the complete run history files are saved in respective folders of alpha values:  0.1, 0.01
+### Once the tests are run the complete run history files are saved in respective folders of alpha values:  0.1, 0.01, for oc method, it creates folders with r values.
 
 ### To visualize results please run the cells in notebook admm_viz.ipynb and admm_colin_viz.ipynb, a few examples:
 
@@ -28,10 +55,6 @@
 
 *For deterministic solver there is only a single trial* 
 
-*To generate the plot in paper, please run the following scripts first*
-> python oc_method/oc_r_sweep.py --help
-> python admm_colin/admm_alpha_sweep.py --help
-
-*Once you run these for a range of r and alpha values, to generate plot please use the notebook admm_oc_colin_comparison.ipynb*
+*The notebook admm_oc_colin_comparison.ipynb has code to generate pareto plots in the paper*
 
 :):
