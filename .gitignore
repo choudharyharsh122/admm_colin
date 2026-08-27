@@ -10,12 +10,28 @@ admm_nc/admm_alpha_rho_sweep/
 *sweep*/
 
 # LArge data files in folders
-admm_colin/run_data*
-admm_colin/__pycache__/
-admm_nc/
-oc_method/OC_results*
-relax_and_round_smooth/fenics_model*
-utility_plots/
+heat_sink/admm_colin/run_data*
+heat_sink/admm_colin/__pycache__/
+heat_sink/admm_nc/
+heat_sink/oc_method/OC_results*
+heat_sink/relax_and_round_smooth/fenics_model_tri*
+heat_sink/utility_plots/
+heat_sink/relax_and_round_smooth/fenics_run_alpha_sweep.py
+heat_sink/admm_colin/admm_run_alpha_sweep.py
+heat_sink/admm_colin/subproblem1_solver_partial.py
+heat_sink/relax_and_round_exact/
+heat_sink/comparison_plots.ipynb
+
+
+cantilever_problem/admm_colin/run_data*
+cantilever_problem/admm_colin/__pycache__/
+cantilever_problem/admm_nc/
+cantilever_problem/oc_method/OC_results*
+cantilever_problem/relax_and_round_smooth/fenics_model_tri*
+cantilever_problem/cantilever_plots/
+cantilever_problem/admm_colin/admm_run_alpha_sweep.py
+cantilever_problem/relax_and_round_smooth/fenics_run_alpha_sweep.py
+cantilever_problem/admm_colin/subproblem1_solver_partial.py
 
 
 # Large binary data
@@ -23,9 +39,10 @@ utility_plots/
 *.pkl
 *.npy
 *.npz
+*.html
 
 # Backup files
-admm_colin/backup*
+heat_sink/admm_colin/backup*
 
 # Python
 __pycache__/
