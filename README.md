@@ -15,7 +15,7 @@
 
 NOTE : The oc_r_sweep is meant to run a sweep over r values so please set r-start, r-end to same values and num-r to 1.
 NOTE : To run the MIP version of ADMM set these two parameters in the config file:
-> use_mip = false
+> use_mip = false ;
 > backend = gurobi
 
 7) To run the perimeter sweep, please run the following files
