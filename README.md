@@ -9,11 +9,11 @@
 
 > python heat_sink/admm_colin/admm_run.py
 
-> python heat_sink/oc_method/oc_r_sweep.py
+> python heat_sink/oc_method/oc_r_sweep.py --r-start 2 --r-end 2 --num-r 1
 
 > python heat_sink/relax_and_round_smooth/fenics_model.py
 
-NOTE : The oc_r_sweep is meant to run a sweep over r values so please set r-start, r-end ato same values and num-r to 1.
+NOTE : The oc_r_sweep is meant to run a sweep over r values so please set r-start, r-end to same values and num-r to 1.
 NOTE : To run the MIP version of ADMM set these two parameters in the config file:
 > use_mip = false
 > backend = gurobi
