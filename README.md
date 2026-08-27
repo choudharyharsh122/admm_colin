@@ -1,6 +1,3 @@
-### To run please use this command in the respecive directory
-
-
 ### Some important points to note: 
 
 1) There are two folders: heat_sink and cantilever.
@@ -11,7 +8,9 @@
 6) If you want to run one instance of each of the 4 methods, please run these files:
 
 > python heat_sink/admm_colin/admm_run.py
+
 > python heat_sink/oc_method/oc_r_sweep.py
+
 > python heat_sink/relax_and_round_smooth/fenics_model.py
 
 NOTE : The oc_r_sweep is meant to run a sweep over r values so please set r-start, r-end ato same values and num-r to 1.
@@ -22,7 +21,9 @@ NOTE : To run the MIP version of ADMM set these two parameters in the config fil
 7) To run the perimeter sweep, please run the following files
 
 > python heat_sink/admm_colin/admm_perimeter_adaptive_sweep.py
+
 > python heat_sink/oc_method/oc_perimeter_adaptive_sweep.py
+
 > python heat_sink/relax_and_round_smooth/fenics_perimeter_adaptive_sweep.py
 
 8) After completion of each instance, the results are stored in respective directories,
